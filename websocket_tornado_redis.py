@@ -1,20 +1,3 @@
-"""
-This is a simple example of WebSocket + Tornado + Redis Pub/Sub usage.
-Do not forget to replace YOURSERVER by the correct value.
-Keep in mind that you need the *very latest* version of your web browser.
-You also need to add Jacob Kristhammar's websocket implementation to Tornado:
-Grab it here:
-    http://gist.github.com/526746
-Or clone my fork of Tornado with websocket included:
-    http://github.com/pelletier/tornado
-Oh and the Pub/Sub protocol is only available in Redis 2.0.0:
-    http://code.google.com/p/redis/downloads/detail?name=redis-2.0.0-rc4.tar.gz
-
-Tested with Chrome 6.0.490.1 dev under OS X.
-
-For questions / feedback / coffee -> @kizlum or thomas@pelletier.im.
-Have fun.
-"""
 import threading
 import tornado.httpserver
 import tornado.websocket
@@ -53,7 +36,7 @@ TEMPLATE = """
             
             
             if ("WebSocket" in window) {
-              var ws = new WebSocket("ws://192.168.19.130:8080/realtime/");
+              var ws = new WebSocket("ws://192.168.19.128:8080/realtime/");
               ws.onopen = function() {};
               ws.onmessage = function (evt) {
                   var received_msg = evt.data;
@@ -94,7 +77,7 @@ class NewMsgHandler(tornado.web.RequestHandler):
         r.publish('test_realtime', data)
         print(data);                
 
-class RealtimeHandler(tornado.websocket.WebSocketHandler):
+class WsHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         LISTENERS.append(self)
         pprint.pprint(LISTENERS)
@@ -110,8 +93,7 @@ settings = {
 }
 
 application = tornado.web.Application([
-    (r'/', NewMsgHandler),
-    (r'/realtime/', RealtimeHandler),
+    (r'/realtime/', WsHandler),
 ], **settings)
 
 
